@@ -1,6 +1,5 @@
 import Html.App exposing (program)
 import Html exposing (Html, text, button)
-import Html.Events exposing (onClick)
 import Debug exposing (log)
 import Http
 import Json.Decode as Decode exposing ((:=))
@@ -12,9 +11,8 @@ type alias Model =
     { lights : List (List Int) }
 
 
-type Msg = Clicked
-        | FetchSucceed Res1
-        | FetchFail Http.RawError
+type Msg = FetchSucceed Res1
+         | FetchFail Http.RawError
 
 
 type alias Res1 =
@@ -64,12 +62,6 @@ decodeJsonLights json =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        Clicked ->
-            let
-                l = log "clicked" model
-            in
-                (model , Cmd.none) 
-
         FetchSucceed response ->
             let
                 l = log "fetch succeed" response
@@ -96,8 +88,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    button [ onClick Clicked ] [ text "click" ]
-
+    text "no view"
 
 
 
