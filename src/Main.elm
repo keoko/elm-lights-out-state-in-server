@@ -1,5 +1,7 @@
 import Html.App exposing (program)
-import Html exposing (Html, text, button)
+import Html exposing (Html, text, button, table, tr, td)
+import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 import Debug exposing (log)
 import Http
 import Json.Decode as Decode exposing ((:=))
@@ -13,6 +15,10 @@ type alias Model =
 
 type Msg = FetchSucceed Res1
          | FetchFail Http.RawError
+         | ToggleLight Point
+
+
+type alias Point = (Int, Int)
 
 
 type alias Res1 =
@@ -25,10 +31,10 @@ type alias Res1 =
 
 
 rows : Int
-rows = 4
+rows = 3
 
 columns : Int
-columns = 4
+columns = 5
 
 main : Program Never
 main =
@@ -86,9 +92,33 @@ update msg model =
             in
                 model ! []
 
+        ToggleLight point ->
+            model ! []
+
+
+
+-- VIEW
+
+viewLight : Point -> Int -> Html Msg
+viewLight (columnIndex, rowIndex) lightOn =
+    td [ style [ ("background", if lightOn == 1 then "blue" else "black" )
+                , ("width", "10vw")
+                , ("height", "10vw")
+                , ("margin", "0.1vw")
+                ]
+
+        , onClick <| ToggleLight (columnIndex, rowIndex) ] []
+
+
+viewRow : Int -> List Int -> Html Msg
+viewRow rowIndex rowLights =
+    tr [] ( List.indexedMap (\columnIndex lights -> viewLight (columnIndex, rowIndex) lights) rowLights )
+
+
 view : Model -> Html Msg
 view model =
-    text "no view"
+    table []
+        (List.indexedMap viewRow model.lights)
 
 
 
@@ -108,15 +138,12 @@ requestResetLights =
         url =
             "http://localhost:3000/reset-lights"
 
-        encodedParams = Encode.object [ ("m", Encode.string <| toString columns)
-                                      , ("n", Encode.string <| toString rows)
-                                      ]
-                        |> Encode.encode 0
+        encodedParams = "m=" ++ (toString rows) ++ "&n=" ++ (toString columns)
 
         request = { verb = "POST"
                   , headers = [("Content-Type", "application/x-www-form-urlencoded")]
                   , url = url
-                  , body = Http.string "m=4&n=4"
+                  , body = Http.string encodedParams 
                   }
 
         sendRequest = Http.send Http.defaultSettings request
