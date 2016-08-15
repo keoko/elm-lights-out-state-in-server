@@ -8,11 +8,14 @@ import Json.Decode as Decode exposing ((:=))
 import Task
 import Dict
 
+
+type alias Lights = List (List Int) 
+
 type alias Model =
-    { lights : List (List Int) }
+    { lights : Lights }
 
 
-type Msg = FetchSucceed Res1
+type Msg = FetchSucceed HttpResponse
          | FetchFail Http.RawError
          | ToggleLight Point
 
@@ -20,7 +23,7 @@ type Msg = FetchSucceed Res1
 type alias Point = (Int, Int)
 
 
-type alias Res1 =
+type alias HttpResponse =
     { headers : Dict.Dict String String
     , status : Int
     , statusText : String
@@ -49,7 +52,7 @@ init =
     ( Model [], requestResetLights )
 
 
-decodeJsonLights : String -> Maybe (List (List Int))
+decodeJsonLights : String -> Maybe Lights
 decodeJsonLights json =
     let
         decoder = "lights" := Decode.list (Decode.list Decode.int)
