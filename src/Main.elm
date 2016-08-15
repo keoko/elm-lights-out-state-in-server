@@ -15,8 +15,8 @@ type alias Model =
     { lights : Lights }
 
 
-type Msg = FetchSucceed HttpResponse
-         | FetchFail Http.RawError
+type Msg = RequestSucceed HttpResponse
+         | RequestFailed Http.RawError
          | ToggleLight Point
 
 
@@ -61,36 +61,26 @@ decodeJsonLights json =
             Ok lights ->
                 Just lights
             error ->
-                let
-                    l = log "decode" error
-                in
-                    Nothing
+                Nothing
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        FetchSucceed response ->
-            let
-                l = log "fetch succeed" response
-            in
-                case response.value of
-                    Http.Text responseValue ->
-                        let
-                            decodedLights = decodeJsonLights responseValue
-                            l' = log "lights" decodedLights
-                        in
-                            case decodedLights of
-                                Just lights ->
-                                    Model lights ! []
-                                _ ->
-                                    model ! []
-                    _ ->
-                        model ! []
+        RequestSucceed response ->
+            case response.value of
+                Http.Text responseValue ->
+                    case (decodeJsonLights responseValue) of
+                        Just lights ->
+                            Model lights ! []
+                        _ ->
+                            model ! []
+                _ ->
+                    model ! []
 
-        FetchFail res ->
+        RequestFailed response ->
             let
-                l = log "fail" res
+                l = log "http request failed" response
             in
                 model ! []
 
@@ -149,7 +139,7 @@ requestResetLights =
 
         sendRequest = Http.send Http.defaultSettings request
     in
-        Task.perform FetchFail FetchSucceed sendRequest
+        Task.perform RequestFailed RequestSucceed sendRequest
 
 
 requestToggleLight : Point -> Cmd Msg
@@ -168,4 +158,4 @@ requestToggleLight (x,y) =
 
         sendRequest = Http.send Http.defaultSettings request
     in
-        Task.perform FetchFail FetchSucceed sendRequest
+        Task.perform RequestFailed RequestSucceed sendRequest

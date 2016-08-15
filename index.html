@@ -8680,7 +8680,6 @@ var _user$project$Main$decodeJsonLights = function (json) {
 	if (_p0.ctor === 'Ok') {
 		return _elm_lang$core$Maybe$Just(_p0._0);
 	} else {
-		var l = A2(_elm_lang$core$Debug$log, 'decode', _p0);
 		return _elm_lang$core$Maybe$Nothing;
 	}
 };
@@ -8746,11 +8745,11 @@ var _user$project$Main$view = function (model) {
 			[]),
 		A2(_elm_lang$core$List$indexedMap, _user$project$Main$viewRow, model.lights));
 };
-var _user$project$Main$FetchFail = function (a) {
-	return {ctor: 'FetchFail', _0: a};
+var _user$project$Main$RequestFailed = function (a) {
+	return {ctor: 'RequestFailed', _0: a};
 };
-var _user$project$Main$FetchSucceed = function (a) {
-	return {ctor: 'FetchSucceed', _0: a};
+var _user$project$Main$RequestSucceed = function (a) {
+	return {ctor: 'RequestSucceed', _0: a};
 };
 var _user$project$Main$requestResetLights = function () {
 	var encodedParams = A2(
@@ -8774,7 +8773,7 @@ var _user$project$Main$requestResetLights = function () {
 		body: _evancz$elm_http$Http$string(encodedParams)
 	};
 	var sendRequest = A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request);
-	return A3(_elm_lang$core$Task$perform, _user$project$Main$FetchFail, _user$project$Main$FetchSucceed, sendRequest);
+	return A3(_elm_lang$core$Task$perform, _user$project$Main$RequestFailed, _user$project$Main$RequestSucceed, sendRequest);
 }();
 var _user$project$Main$init = {
 	ctor: '_Tuple2',
@@ -8806,20 +8805,16 @@ var _user$project$Main$requestToggleLight = function (_p3) {
 		body: _evancz$elm_http$Http$string(encodedParams)
 	};
 	var sendRequest = A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request);
-	return A3(_elm_lang$core$Task$perform, _user$project$Main$FetchFail, _user$project$Main$FetchSucceed, sendRequest);
+	return A3(_elm_lang$core$Task$perform, _user$project$Main$RequestFailed, _user$project$Main$RequestSucceed, sendRequest);
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
 		var _p5 = msg;
 		switch (_p5.ctor) {
-			case 'FetchSucceed':
-				var _p8 = _p5._0;
-				var l = A2(_elm_lang$core$Debug$log, 'fetch succeed', _p8);
-				var _p6 = _p8.value;
+			case 'RequestSucceed':
+				var _p6 = _p5._0.value;
 				if (_p6.ctor === 'Text') {
-					var decodedLights = _user$project$Main$decodeJsonLights(_p6._0);
-					var l$ = A2(_elm_lang$core$Debug$log, 'lights', decodedLights);
-					var _p7 = decodedLights;
+					var _p7 = _user$project$Main$decodeJsonLights(_p6._0);
 					if (_p7.ctor === 'Just') {
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
@@ -8840,8 +8835,8 @@ var _user$project$Main$update = F2(
 						_elm_lang$core$Native_List.fromArray(
 							[]));
 				}
-			case 'FetchFail':
-				var l = A2(_elm_lang$core$Debug$log, 'fail', _p5._0);
+			case 'RequestFailed':
+				var l = A2(_elm_lang$core$Debug$log, 'http request failed', _p5._0);
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
