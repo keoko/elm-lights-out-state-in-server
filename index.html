@@ -8684,60 +8684,11 @@ var _user$project$Main$decodeJsonLights = function (json) {
 		return _elm_lang$core$Maybe$Nothing;
 	}
 };
-var _user$project$Main$columns = 5;
+var _user$project$Main$columns = 3;
 var _user$project$Main$rows = 3;
 var _user$project$Main$Model = function (a) {
 	return {lights: a};
 };
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
-			case 'FetchSucceed':
-				var _p4 = _p1._0;
-				var l = A2(_elm_lang$core$Debug$log, 'fetch succeed', _p4);
-				var _p2 = _p4.value;
-				if (_p2.ctor === 'Text') {
-					var decodedLights = _user$project$Main$decodeJsonLights(_p2._0);
-					var l$ = A2(_elm_lang$core$Debug$log, 'lights', decodedLights);
-					var _p3 = decodedLights;
-					if (_p3.ctor === 'Just') {
-						return A2(
-							_elm_lang$core$Platform_Cmd_ops['!'],
-							_user$project$Main$Model(_p3._0),
-							_elm_lang$core$Native_List.fromArray(
-								[]));
-					} else {
-						return A2(
-							_elm_lang$core$Platform_Cmd_ops['!'],
-							_user$project$Main$Model(
-								_elm_lang$core$Native_List.fromArray(
-									[])),
-							_elm_lang$core$Native_List.fromArray(
-								[]));
-					}
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
-						_elm_lang$core$Native_List.fromArray(
-							[]));
-				}
-			case 'FetchFail':
-				var l = A2(_elm_lang$core$Debug$log, 'fail', _p1._0);
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					_elm_lang$core$Native_List.fromArray(
-						[]));
-			default:
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					_elm_lang$core$Native_List.fromArray(
-						[]));
-		}
-	});
 var _user$project$Main$Res1 = F5(
 	function (a, b, c, d, e) {
 		return {headers: a, status: b, statusText: c, url: d, value: e};
@@ -8746,8 +8697,8 @@ var _user$project$Main$ToggleLight = function (a) {
 	return {ctor: 'ToggleLight', _0: a};
 };
 var _user$project$Main$viewLight = F2(
-	function (_p5, lightOn) {
-		var _p6 = _p5;
+	function (_p1, lightOn) {
+		var _p2 = _p1;
 		return A2(
 			_elm_lang$html$Html$td,
 			_elm_lang$core$Native_List.fromArray(
@@ -8766,7 +8717,7 @@ var _user$project$Main$viewLight = F2(
 						])),
 					_elm_lang$html$Html_Events$onClick(
 					_user$project$Main$ToggleLight(
-						{ctor: '_Tuple2', _0: _p6._0, _1: _p6._1}))
+						{ctor: '_Tuple2', _0: _p2._0, _1: _p2._1}))
 				]),
 			_elm_lang$core$Native_List.fromArray(
 				[]));
@@ -8783,7 +8734,7 @@ var _user$project$Main$viewRow = F2(
 					function (columnIndex, lights) {
 						return A2(
 							_user$project$Main$viewLight,
-							{ctor: '_Tuple2', _0: columnIndex, _1: rowIndex},
+							{ctor: '_Tuple2', _0: rowIndex, _1: columnIndex},
 							lights);
 					}),
 				rowLights));
@@ -8832,6 +8783,78 @@ var _user$project$Main$init = {
 			[])),
 	_1: _user$project$Main$requestResetLights
 };
+var _user$project$Main$requestToggleLight = function (_p3) {
+	var _p4 = _p3;
+	var encodedParams = A2(
+		_elm_lang$core$Basics_ops['++'],
+		'x=',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Basics$toString(_p4._0),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'&y=',
+				_elm_lang$core$Basics$toString(_p4._1))));
+	var url = 'http://localhost:3000/flip-light';
+	var request = {
+		verb: 'POST',
+		headers: _elm_lang$core$Native_List.fromArray(
+			[
+				{ctor: '_Tuple2', _0: 'Content-Type', _1: 'application/x-www-form-urlencoded'}
+			]),
+		url: url,
+		body: _evancz$elm_http$Http$string(encodedParams)
+	};
+	var sendRequest = A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request);
+	return A3(_elm_lang$core$Task$perform, _user$project$Main$FetchFail, _user$project$Main$FetchSucceed, sendRequest);
+};
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p5 = msg;
+		switch (_p5.ctor) {
+			case 'FetchSucceed':
+				var _p8 = _p5._0;
+				var l = A2(_elm_lang$core$Debug$log, 'fetch succeed', _p8);
+				var _p6 = _p8.value;
+				if (_p6.ctor === 'Text') {
+					var decodedLights = _user$project$Main$decodeJsonLights(_p6._0);
+					var l$ = A2(_elm_lang$core$Debug$log, 'lights', decodedLights);
+					var _p7 = decodedLights;
+					if (_p7.ctor === 'Just') {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_user$project$Main$Model(_p7._0),
+							_elm_lang$core$Native_List.fromArray(
+								[]));
+					} else {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							_elm_lang$core$Native_List.fromArray(
+								[]));
+					}
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						_elm_lang$core$Native_List.fromArray(
+							[]));
+				}
+			case 'FetchFail':
+				var l = A2(_elm_lang$core$Debug$log, 'fail', _p5._0);
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					_elm_lang$core$Native_List.fromArray(
+						[]));
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Main$requestToggleLight(_p5._0)
+				};
+		}
+	});
 var _user$project$Main$main = {
 	main: _elm_lang$html$Html_App$program(
 		{init: _user$project$Main$init, view: _user$project$Main$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})

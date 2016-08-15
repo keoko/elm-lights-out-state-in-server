@@ -5,7 +5,6 @@ import Html.Events exposing (onClick)
 import Debug exposing (log)
 import Http
 import Json.Decode as Decode exposing ((:=))
-import Json.Encode as Encode
 import Task
 import Dict
 
@@ -34,7 +33,7 @@ rows : Int
 rows = 3
 
 columns : Int
-columns = 5
+columns = 3
 
 main : Program Never
 main =
@@ -82,7 +81,7 @@ update msg model =
                                 Just lights ->
                                     Model lights ! []
                                 _ ->
-                                    Model [] ! []
+                                    model ! []
                     _ ->
                         model ! []
 
@@ -93,8 +92,7 @@ update msg model =
                 model ! []
 
         ToggleLight point ->
-            model ! []
-
+            (model, requestToggleLight point)
 
 
 -- VIEW
@@ -112,7 +110,7 @@ viewLight (columnIndex, rowIndex) lightOn =
 
 viewRow : Int -> List Int -> Html Msg
 viewRow rowIndex rowLights =
-    tr [] ( List.indexedMap (\columnIndex lights -> viewLight (columnIndex, rowIndex) lights) rowLights )
+    tr [] ( List.indexedMap (\columnIndex lights -> viewLight (rowIndex, columnIndex) lights) rowLights )
 
 
 view : Model -> Html Msg
@@ -143,7 +141,26 @@ requestResetLights =
         request = { verb = "POST"
                   , headers = [("Content-Type", "application/x-www-form-urlencoded")]
                   , url = url
-                  , body = Http.string encodedParams 
+                  , body = Http.string encodedParams
+                  }
+
+        sendRequest = Http.send Http.defaultSettings request
+    in
+        Task.perform FetchFail FetchSucceed sendRequest
+
+
+requestToggleLight : Point -> Cmd Msg
+requestToggleLight (x,y) =
+    let
+        url =
+            "http://localhost:3000/flip-light"
+
+        encodedParams = "x=" ++ (toString x) ++ "&y=" ++ (toString y)
+
+        request = { verb = "POST"
+                  , headers = [("Content-Type", "application/x-www-form-urlencoded")]
+                  , url = url
+                  , body = Http.string encodedParams
                   }
 
         sendRequest = Http.send Http.defaultSettings request

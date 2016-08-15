@@ -1,0 +1,9 @@
+* Notes
+
+* Doubts
+** Not sure if HTTP POST request could be simplified
+
+* Issues
+** POST params cannot be sent as JSON, it should be either query params or form urlencoded
+This is not related to Elm, but the Clojure server implementation.
+
